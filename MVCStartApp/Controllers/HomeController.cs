@@ -6,16 +6,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MVCStartApp.Models;
+using MVCStartApp.Models.Db;
 
 namespace MVCStartApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IBlogRepository repo;
+        private readonly ILogger<HomeController> logger;
+        private readonly IRequestRepository requestRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IBlogRepository repo, IRequestRepository requestRepository)
         {
-            _logger = logger;
+            this.logger = logger;
+            this.repo = repo;
+            this.requestRepository = requestRepository;
         }
 
         public IActionResult Index()
@@ -27,6 +32,13 @@ namespace MVCStartApp.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> logs()
+        {
+            var requests = await requestRepository.GetRequests();
+            return View(requests);
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
